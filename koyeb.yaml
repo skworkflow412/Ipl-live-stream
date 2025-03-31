@@ -1,0 +1,19 @@
+services:
+  - name: ipl-streaming
+    ports:
+      - port: 3000
+        http: true
+    env:
+      - key: MONGODB_URI
+        value: ${MONGO_DB_URI}
+      - key: JWT_SECRET
+        value: ${JWT_SECRET}
+    regions:
+      - syd
+    docker:
+      image: koyeb/ipl-streaming
+      args: []
+    http_options:
+      endpoints:
+        - path: /
+          port: 3000
