@@ -12,7 +12,6 @@ services:
       - syd
     docker:
       image: koyeb/ipl-streaming
-      args: []
     http_options:
       endpoints:
         - path: /
