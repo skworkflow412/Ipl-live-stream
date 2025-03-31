@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Same as before, but now uses data from API -->
+</head>
+<body>
+    <div class="container">
+        <header class="header" id="site-header">
+            <h1><i class="fas fa-tv"></i> <span id="site-title">IPL Live Streaming</span></h1>
+        </header>
+        
+        <div class="video-container">
+            <video id="ipl-video" class="video-js vjs-default-skin" controls preload="auto" data-setup='{"fluid": true}'>
+                <!-- Sources will be added dynamically -->
+            </video>
+        </div>
+        
+        <div class="card" id="streams-container">
+            <h2><i class="fas fa-server"></i> Streaming Servers</h2>
+            <p>Select a server below if you experience any buffering issues.</p>
+            <div class="server-grid" id="servers-grid">
+                <!-- Servers will be added dynamically -->
+            </div>
+        </div>
+        
+        <div class="ads-section" id="ad-container">
+            <p>Advertisement</p>
+            <!-- Ad will be injected here -->
+        </div>
+        
+        <div class="card" id="telegram-container">
+            <h2><i class="fab fa-telegram"></i> Join Our Telegram Channel</h2>
+            <p id="telegram-desc">Get instant updates on live streaming links.</p>
+            <a href="#" target="_blank" class="btn btn-telegram" id="telegram-link">
+                <i class="fab fa-telegram"></i> Join Telegram Channel
+            </a>
+        </div>
+        
+        <div class="card share-notice" id="share-notice">
+            <!-- Share notice content -->
+        </div>
+        
+        <footer class="footer">
+            <p>© <span id="current-year"></span> <span id="footer-title">IPL Live Streaming</span></p>
+            <p>Disclaimer: We do not host any streams, we only provide links to publicly available streams.</p>
+        </footer>
+    </div>
+
+    <script>
+        // This will be replaced with dynamic loading from API
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Load settings
+            const settingsRes = await fetch('/api/public/settings');
+            const settings = await settingsRes.json();
+            
+            document.getElementById('site-title').textContent = settings.siteTitle;
+            document.getElementById('footer-title').textContent = settings.siteTitle;
+            document.getElementById('telegram-link').href = settings.telegramLink;
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+            
+            // Load streams
+            const streamsRes = await fetch('/api/public/streams');
+            const streams = await streamsRes.json();
+            
+            const serversGrid = document.getElementById('servers-grid');
+            serversGrid.innerHTML = '';
+            
+            streams.forEach((stream, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn' + (index === 0 ? ' btn-secondary' : '');
+                btn.innerHTML = `<i class="fas fa-play-circle"></i> ${stream.title}`;
+                btn.onclick = () => changeStream(stream.url);
+                serversGrid.appendChild(btn);
+            });
+            
+            // Load ad
+            const adRes = await fetch('/api/public/ads');
+            const ads = await adRes.json();
+            if (ads.length > 0) {
+                document.getElementById('ad-container').innerHTML = ads[0].code;
+            }
+            
+            // Initialize player with first stream
+            if (streams.length > 0) {
+                player.src({ src: streams[0].url, type: 'application/x-mpegURL' });
+            }
+        });
+        
+        // Rest of your existing player and sharing logic
+    </script>
+</body>
+</html>
